@@ -22,7 +22,7 @@ def analyze_interview(
     filler_words_list = [{"word": w, "count": c} for w, c in sorted(filler_counts.items(), key=lambda x: -x[1])]
     total_fillers = sum(filler_counts.values())
 
-    wpm = round(len(word_list) / (duration_seconds / 60)) if duration_seconds > 0 else 0
+    wpm = int(len(word_list) / (duration_seconds / 60)) if duration_seconds > 0 else 0
 
     context = f"""
 Role: {role or 'Not specified'}
