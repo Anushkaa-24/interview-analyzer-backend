@@ -3,4 +3,4 @@ uvicorn
 openai
 anthropic
 python-multipart
-openai-whisper
+groq
