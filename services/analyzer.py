@@ -37,7 +37,7 @@ TRANSCRIPT:
 {transcript}
 """.strip()
 
-    api_key = os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
+    api_key = os.getenv("GROQ_API_KEY") or os.getenv("OPENAI_API_KEY") or os.getenv("ANTHROPIC_API_KEY")
     if api_key:
         try:
             result = _ai_analyze(context, role, filler_words_list, total_fillers, api_key)
@@ -91,11 +91,26 @@ Return ONLY valid JSON (no markdown, no explanation) with this exact structure:
 
 Generate 3-5 questions, 4-5 weaknesses, and 4 improvement plan weeks based on actual transcript content."""
 
+    if os.getenv("GROQ_API_KEY"):
+        return _call_groq(prompt)
+
     if os.getenv("OPENAI_API_KEY"):
         return _call_openai(prompt)
 
     if os.getenv("ANTHROPIC_API_KEY"):
         return _call_anthropic(prompt)
+
+
+def _call_groq(prompt: str) -> dict:
+    from groq import Groq
+    client = Groq(api_key=os.getenv("GROQ_API_KEY"))
+    resp = client.chat.completions.create(
+        model="llama3-70b-8192",
+        messages=[{"role": "user", "content": prompt}],
+        temperature=0.3,
+    )
+    raw = resp.choices[0].message.content.strip()
+    return json.loads(raw.replace("```json", "").replace("```", "").strip())
 
 
 def _call_openai(prompt: str) -> dict:
